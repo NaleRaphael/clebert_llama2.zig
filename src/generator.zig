@@ -37,19 +37,13 @@ pub fn generate(self: *Self, writer: anytype, workers: []Worker) !void {
     var prompt_tokens_index: usize = 0;
     var n_timed_positions: usize = 0;
     var start_time: i64 = 0;
-    var total_time: i64 = 0;
 
     for (0..self.transformer.sequence_length) |position| {
         if (position > 0) {
             n_timed_positions += 1;
-            start_time = std.time.milliTimestamp();
         }
 
         try self.transformer.forward(token, position, workers);
-
-        if (start_time > 0) {
-            total_time += std.time.milliTimestamp() - start_time;
-        }
 
         if (prompt_tokens_index < self.prompt_tokens.len) {
             next_token = self.prompt_tokens[prompt_tokens_index];
@@ -67,11 +61,17 @@ pub fn generate(self: *Self, writer: anytype, workers: []Worker) !void {
         try print(word, writer);
 
         token = next_token;
+
+        // skip the first iteration since it can be slower
+        if (start_time == 0) {
+            start_time = std.time.milliTimestamp();
+        }
     }
 
     if (n_timed_positions > 0 and self.verbose) {
+        const end_time: i64 = std.time.milliTimestamp();
         const average_time =
-            @as(f32, @floatFromInt(total_time)) / @as(f32, @floatFromInt(n_timed_positions));
+            @as(f32, @floatFromInt(end_time - start_time)) / @as(f32, @floatFromInt(n_timed_positions));
 
         try writer.print("\n\nachieved: {d:.3} tok/s", .{@as(f32, 1000 / average_time)});
     }
