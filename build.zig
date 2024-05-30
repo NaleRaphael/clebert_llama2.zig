@@ -18,11 +18,6 @@ pub fn build(b: *std.Build) void {
         .optimize = optimize,
     });
 
-    const build_options = b.addOptions();
-
-    generator_exe.addOptions("build_options", build_options);
-    chat_exe.addOptions("build_options", build_options);
-
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
     // step when running `zig build`).
@@ -67,8 +62,6 @@ pub fn build(b: *std.Build) void {
         .target = target,
         .optimize = optimize,
     });
-
-    generator_tests.addOptions("build_options", build_options);
 
     const run_tests = b.addRunArtifact(generator_tests);
 

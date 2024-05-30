@@ -36,17 +36,17 @@ pub fn initLeaky(allocator: std.mem.Allocator, args: anytype) !Self {
 
     defer file.close();
 
-    if (try file.reader().readIntLittle(u32) != 0x616b3432) return error.InvalidMagic;
-    if (try file.reader().readIntLittle(i32) != 1) return error.InvalidVersion;
+    if (try file.reader().readInt(u32, .little) != 0x616b3432) return error.InvalidMagic;
+    if (try file.reader().readInt(i32, .little) != 1) return error.InvalidVersion;
 
-    const embedding_size: usize = @intCast(try file.reader().readIntLittle(i32));
-    const ffn_hidden_size: usize = @intCast(try file.reader().readIntLittle(i32));
-    const n_layers: usize = @intCast(try file.reader().readIntLittle(i32));
-    const n_attention_heads: usize = @intCast(try file.reader().readIntLittle(i32));
-    const n_attention_query_groups: usize = @intCast(try file.reader().readIntLittle(i32));
-    const vocab_size: usize = @intCast(try file.reader().readIntLittle(i32));
-    const max_sequence_length: usize = @intCast(try file.reader().readIntLittle(i32));
-    const shared_output_weight = try file.reader().readIntLittle(u8) == 1;
+    const embedding_size: usize = @intCast(try file.reader().readInt(i32, .little));
+    const ffn_hidden_size: usize = @intCast(try file.reader().readInt(i32, .little));
+    const n_layers: usize = @intCast(try file.reader().readInt(i32, .little));
+    const n_attention_heads: usize = @intCast(try file.reader().readInt(i32, .little));
+    const n_attention_query_groups: usize = @intCast(try file.reader().readInt(i32, .little));
+    const vocab_size: usize = @intCast(try file.reader().readInt(i32, .little));
+    const max_sequence_length: usize = @intCast(try file.reader().readInt(i32, .little));
+    const shared_output_weight = try file.reader().readInt(u8, .little) == 1;
 
     try file.seekTo(256);
 
